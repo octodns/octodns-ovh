@@ -1,6 +1,4 @@
-TODO: Review this README and add or modify as necessary.
-
-## OVHcloud DNS provider for octoDNS
+## OVHcloud DNS v6 API provider for octoDNS
 
 An [octoDNS](https://github.com/octodns/octodns/) provider that targets [OVHcloud DNS](https://www.ovhcloud.com/en/domains/dns-subdomain/).
 
@@ -38,21 +36,26 @@ octodns_ovh==0.0.1
 providers:
   ovh:
     class: octodns_ovh.OvhProvider
-    # TODO
+    # OVH api v6 endpoint
+    endpoint: ovh-eu
+    # API application key
+    application_key: env/OVH_APPLICATION_KEY
+    # API application secret
+    application_secret: env/OVH_APPLICATION_SECRET
+    # API consumer key
+    consumer_key: env/OVH_CONSUMER_KEY
 ```
 
 ### Support Information
 
 #### Records
 
-TODO: All octoDNS record types are supported.
+OvhProvider supports A, AAAA, CAA, CNAME, DKIM, MX, NAPTR, NS, PTR, SPF, SRV, SSHFP, and TXT
 
 #### Dynamic
 
-TODO: OvhProvider does not support dynamic records.
+OvhProvider does not support dynamic records.
 
 ### Developement
 
 See the [/script/](/script/) directory for some tools to help with the development process. They generally follow the [Script to rule them all](https://github.com/github/scripts-to-rule-them-all) pattern. Most useful is `./script/bootstrap` which will create a venv and install both the runtime and development related requirements. It will also hook up a pre-commit hook that covers most of what's run by CI.
-
-TODO: any provider specific setup, a docker compose to run things locally etc?
