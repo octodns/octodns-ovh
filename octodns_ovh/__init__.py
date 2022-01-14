@@ -180,7 +180,7 @@ class OvhProvider(BaseProvider):
             values.append({
                 'port': port,
                 'priority': priority,
-                'target': f'{target}.',
+                'target': f'{target}',
                 'weight': weight
             })
         return {
