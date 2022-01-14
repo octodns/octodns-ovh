@@ -29,7 +29,7 @@ setup(
     python_requires='>=3.6',
     install_requires=(
         'octodns>=0.9.14',
-        'ovh=0.5.0'
+        'ovh>=0.5.0',
     ),
     url='https://github.com/octodns/octodns-ovh',
     version=version(),
