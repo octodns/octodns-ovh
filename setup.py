@@ -17,24 +17,35 @@ def version():
 
 description, long_description = descriptions()
 
+tests_require = (
+    'pytest',
+    'pytest-network',
+)
+
 setup(
     author='Ross McFarland',
     author_email='rwmcfa1@gmail.com',
     description=description,
+    extras_require={
+        'dev': tests_require + (
+            'build>=0.7.0',
+            'pycodestyle>=2.6.0',
+            'pyflakes>=2.2.0',
+            'readme_renderer[md]>=26.0',
+            'twine>=3.4.2',
+        ),
+    },
+    install_requires=(
+        'octodns>=0.9.14',
+        'ovh>=0.5.0',
+    ),
     license='MIT',
     long_description=long_description,
     long_description_content_type='text/markdown',
     name='octodns-ovh',
     packages=find_packages(),
     python_requires='>=3.6',
-    install_requires=(
-        'octodns>=0.9.14',
-        'ovh>=0.5.0',
-    ),
+    tests_require=tests_require,
     url='https://github.com/octodns/octodns-ovh',
     version=version(),
-    tests_require=(
-        'pytest',
-        'pytest-network',
-    ),
 )
