@@ -398,8 +398,6 @@ class TestOvhProvider(TestCase):
                 get_mock.side_effect = [[100], [101], [102], [103]]
                 provider.apply(plan)
                 wanted_calls = [
-                    call('/domain/zone/unit.tests/record', fieldType='A',
-                         subDomain='', target='1.2.3.4', ttl=100),
                     call('/domain/zone/unit.tests/record', fieldType='AAAA',
                          subDomain='', target='1:1ec:1::1', ttl=200),
                     call('/domain/zone/unit.tests/record', fieldType='MX',
@@ -423,6 +421,20 @@ class TestOvhProvider(TestCase):
                     call('/domain/zone/unit.tests/record', fieldType='CAA',
                          subDomain='caa', target='0 issue "ca.unit.tests"',
                          ttl=1600),
+                    call('/domain/zone/unit.tests/record', fieldType='NAPTR',
+                         subDomain='naptr',
+                         target='10 100 "S" "SIP+D2U" "!^.*$!sip:info@bar.exam'
+                         'ple.com!" .', ttl=500),
+                    call('/domain/zone/unit.tests/record', fieldType='A',
+                         subDomain='sub', target='1.2.3.4', ttl=200),
+                    call('/domain/zone/unit.tests/record', fieldType='CNAME',
+                         subDomain='www2', target='unit.tests.', ttl=300),
+                    call('/domain/zone/unit.tests/record', fieldType='NS',
+                         subDomain='www3', target='ns3.unit.tests.', ttl=700),
+                    call('/domain/zone/unit.tests/record', fieldType='NS',
+                         subDomain='www3', target='ns4.unit.tests.', ttl=700),
+                    call('/domain/zone/unit.tests/record', fieldType='A',
+                         subDomain='', target='1.2.3.4', ttl=100),
                     call('/domain/zone/unit.tests/record', fieldType='DKIM',
                          subDomain='dkim',
                          target='p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxLaG'
@@ -430,20 +442,8 @@ class TestOvhProvider(TestCase):
                          'MFyqC//tft3ohx3nvJl+bGCWxdtLYDSmir9PW54e5CTdxEh8MWRk'
                          'BO3StF6QG/tAh3aTGDmkqhIJGLb87iHvpmVKqURmEUzJPv5KPJfW'
                          'LofADI+q9lQIDAQAB', ttl=1300),
-                    call('/domain/zone/unit.tests/record', fieldType='NAPTR',
-                         subDomain='naptr',
-                         target='10 100 "S" "SIP+D2U" "!^.*$!sip:info@bar.exam'
-                         'ple.com!" .', ttl=500),
-                    call('/domain/zone/unit.tests/record', fieldType='A',
-                         subDomain='sub', target='1.2.3.4', ttl=200),
                     call('/domain/zone/unit.tests/record', fieldType='TXT',
                          subDomain='txt', target='TXT text', ttl=1400),
-                    call('/domain/zone/unit.tests/record', fieldType='CNAME',
-                         subDomain='www2', target='unit.tests.', ttl=300),
-                    call('/domain/zone/unit.tests/record', fieldType='NS',
-                         subDomain='www3', target='ns3.unit.tests.', ttl=700),
-                    call('/domain/zone/unit.tests/record', fieldType='NS',
-                         subDomain='www3', target='ns4.unit.tests.', ttl=700),
                     call('/domain/zone/unit.tests/refresh')]
 
                 post_mock.assert_has_calls(wanted_calls)
@@ -451,11 +451,11 @@ class TestOvhProvider(TestCase):
                 # Get for delete calls
                 wanted_get_calls = [
                     call(u'/domain/zone/unit.tests/record', fieldType=u'A',
+                         subDomain='fake'),
+                    call(u'/domain/zone/unit.tests/record', fieldType=u'A',
                          subDomain=u''),
                     call(u'/domain/zone/unit.tests/record', fieldType=u'DKIM',
                          subDomain='dkim'),
-                    call(u'/domain/zone/unit.tests/record', fieldType=u'A',
-                         subDomain='fake'),
                     call(u'/domain/zone/unit.tests/record', fieldType=u'TXT',
                          subDomain='txt')]
                 get_mock.assert_has_calls(wanted_get_calls)
