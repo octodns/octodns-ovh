@@ -446,7 +446,7 @@ class TestOvhProvider(TestCase):
                          subDomain='txt', target='TXT text', ttl=1400),
                     call('/domain/zone/unit.tests/refresh')]
 
-                post_mock.assert_has_calls(wanted_calls)
+                post_mock.assert_has_calls(wanted_calls, any_order=True)
 
                 # Get for delete calls
                 wanted_get_calls = [
@@ -458,7 +458,7 @@ class TestOvhProvider(TestCase):
                          subDomain='dkim'),
                     call(u'/domain/zone/unit.tests/record', fieldType=u'TXT',
                          subDomain='txt')]
-                get_mock.assert_has_calls(wanted_get_calls)
+                get_mock.assert_has_calls(wanted_get_calls, any_order=True)
                 # 4 delete calls for update and delete
                 delete_mock.assert_has_calls(
                     [call(u'/domain/zone/unit.tests/record/100'),
