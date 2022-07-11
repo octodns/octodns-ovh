@@ -23,15 +23,43 @@ class OvhProvider(BaseProvider):
 
     # This variable is also used in populate method to filter which OVH record
     # types are supported by octodns
-    SUPPORTS = set(('A', 'AAAA', 'CAA', 'CNAME', 'DKIM', 'MX', 'NAPTR', 'NS',
-                    'PTR', 'SPF', 'SRV', 'SSHFP', 'TXT'))
+    SUPPORTS = set(
+        (
+            'A',
+            'AAAA',
+            'CAA',
+            'CNAME',
+            'DKIM',
+            'MX',
+            'NAPTR',
+            'NS',
+            'PTR',
+            'SPF',
+            'SRV',
+            'SSHFP',
+            'TXT',
+        )
+    )
 
-    def __init__(self, id, endpoint, application_key, application_secret,
-                 consumer_key, *args, **kwargs):
+    def __init__(
+        self,
+        id,
+        endpoint,
+        application_key,
+        application_secret,
+        consumer_key,
+        *args,
+        **kwargs,
+    ):
         self.log = logging.getLogger(f'OvhProvider[{id}]')
-        self.log.debug('__init__: id=%s, endpoint=%s, application_key=%s, '
-                       'application_secret=***, consumer_key=%s', id, endpoint,
-                       application_key, consumer_key)
+        self.log.debug(
+            '__init__: id=%s, endpoint=%s, application_key=%s, '
+            'application_secret=***, consumer_key=%s',
+            id,
+            endpoint,
+            application_key,
+            consumer_key,
+        )
         super(OvhProvider, self).__init__(id, *args, **kwargs)
         self._client = ovh.Client(
             endpoint=endpoint,
@@ -41,8 +69,12 @@ class OvhProvider(BaseProvider):
         )
 
     def populate(self, zone, target=False, lenient=False):
-        self.log.debug('populate: name=%s, target=%s, lenient=%s', zone.name,
-                       target, lenient)
+        self.log.debug(
+            'populate: name=%s, target=%s, lenient=%s',
+            zone.name,
+            target,
+            lenient,
+        )
         zone_name = zone.name[:-1]
         try:
             records = self.get_records(zone_name=zone_name)
@@ -61,24 +93,34 @@ class OvhProvider(BaseProvider):
         for name, types in values.items():
             for _type, records in types.items():
                 if _type not in self.SUPPORTS:
-                    self.log.warning('Not managed record of type %s, skip',
-                                     _type)
+                    self.log.warning(
+                        'Not managed record of type %s, skip', _type
+                    )
                     continue
                 data_for = getattr(self, f'_data_for_{_type}')
-                record = Record.new(zone, name, data_for(_type, records),
-                                    source=self, lenient=lenient)
+                record = Record.new(
+                    zone,
+                    name,
+                    data_for(_type, records),
+                    source=self,
+                    lenient=lenient,
+                )
                 zone.add_record(record, lenient=lenient)
 
-        self.log.info('populate:   found %s records, exists=%s',
-                      len(zone.records) - before, exists)
+        self.log.info(
+            'populate:   found %s records, exists=%s',
+            len(zone.records) - before,
+            exists,
+        )
         return exists
 
     def _apply(self, plan):
         desired = plan.desired
         changes = plan.changes
         zone_name = desired.name[:-1]
-        self.log.info('_apply: zone=%s, len(changes)=%d', desired.name,
-                      len(changes))
+        self.log.info(
+            '_apply: zone=%s, len(changes)=%d', desired.name, len(changes)
+        )
         for change in changes:
             class_name = change.__class__.__name__
             getattr(self, f'_apply_{class_name}'.lower())(zone_name, change)
@@ -109,110 +151,88 @@ class OvhProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [record['target'] for record in records]
+            'values': [record['target'] for record in records],
         }
 
     @staticmethod
     def _data_for_single(_type, records):
         record = records[0]
-        return {
-            'ttl': record['ttl'],
-            'type': _type,
-            'value': record['target']
-        }
+        return {'ttl': record['ttl'], 'type': _type, 'value': record['target']}
 
     @staticmethod
     def _data_for_CAA(_type, records):
         values = []
         for record in records:
             flags, tag, value = record['target'].split(' ', 2)
-            values.append({
-                'flags': flags,
-                'tag': tag,
-                'value': value[1:-1]
-            })
-        return {
-            'ttl': records[0]['ttl'],
-            'type': _type,
-            'values': values
-        }
+            values.append({'flags': flags, 'tag': tag, 'value': value[1:-1]})
+        return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     @staticmethod
     def _data_for_MX(_type, records):
         values = []
         for record in records:
             preference, exchange = record['target'].split(' ', 1)
-            values.append({
-                'preference': preference,
-                'exchange': exchange,
-            })
-        return {
-            'ttl': records[0]['ttl'],
-            'type': _type,
-            'values': values,
-        }
+            values.append({'preference': preference, 'exchange': exchange})
+        return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     @staticmethod
     def _data_for_NAPTR(_type, records):
         values = []
         for record in records:
             order, preference, flags, service, regexp, replacement = record[
-                'target'].split(' ', 5)
-            values.append({
-                'flags': flags[1:-1],
-                'order': order,
-                'preference': preference,
-                'regexp': regexp[1:-1],
-                'replacement': replacement,
-                'service': service[1:-1],
-            })
-        return {
-            'type': _type,
-            'ttl': records[0]['ttl'],
-            'values': values
-        }
+                'target'
+            ].split(' ', 5)
+            values.append(
+                {
+                    'flags': flags[1:-1],
+                    'order': order,
+                    'preference': preference,
+                    'regexp': regexp[1:-1],
+                    'replacement': replacement,
+                    'service': service[1:-1],
+                }
+            )
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
 
     @staticmethod
     def _data_for_SRV(_type, records):
         values = []
         for record in records:
             priority, weight, port, target = record['target'].split(' ', 3)
-            values.append({
-                'port': port,
-                'priority': priority,
-                'target': f'{target}',
-                'weight': weight
-            })
-        return {
-            'type': _type,
-            'ttl': records[0]['ttl'],
-            'values': values
-        }
+            values.append(
+                {
+                    'port': port,
+                    'priority': priority,
+                    'target': f'{target}',
+                    'weight': weight,
+                }
+            )
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
 
     @staticmethod
     def _data_for_SSHFP(_type, records):
         values = []
         for record in records:
             algorithm, fingerprint_type, fingerprint = record['target'].split(
-                ' ', 2)
-            values.append({
-                'algorithm': algorithm,
-                'fingerprint': fingerprint,
-                'fingerprint_type': fingerprint_type
-            })
-        return {
-            'type': _type,
-            'ttl': records[0]['ttl'],
-            'values': values
-        }
+                ' ', 2
+            )
+            values.append(
+                {
+                    'algorithm': algorithm,
+                    'fingerprint': fingerprint,
+                    'fingerprint_type': fingerprint_type,
+                }
+            )
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
 
     @staticmethod
     def _data_for_DKIM(_type, records):
         return {
             'ttl': records[0]['ttl'],
             'type': "TXT",
-            'values': [record['target'].replace(';', '\\;')
-                       for record in records]
+            'values': [
+                record['target'].replace(';', '\\;') for record in records
+            ],
         }
 
     _data_for_A = _data_for_multiple
@@ -239,7 +259,7 @@ class OvhProvider(BaseProvider):
             'target': record.value,
             'subDomain': record.name,
             'ttl': record.ttl,
-            'fieldType': record._type
+            'fieldType': record._type,
         }
 
     @staticmethod
@@ -249,7 +269,7 @@ class OvhProvider(BaseProvider):
                 'target': f'{value.flags} {value.tag} "{value.value}"',
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': record._type
+                'fieldType': record._type,
             }
 
     @staticmethod
@@ -259,19 +279,21 @@ class OvhProvider(BaseProvider):
                 'target': f'{value.preference:d} {value.exchange}',
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': record._type
+                'fieldType': record._type,
             }
 
     @staticmethod
     def _params_for_NAPTR(record):
         for value in record.values:
-            content = f'{value.order} {value.preference} "{value.flags}" ' \
+            content = (
+                f'{value.order} {value.preference} "{value.flags}" '
                 f'"{value.service}" "{value.regexp}" {value.replacement}'
+            )
             yield {
                 'target': content,
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': record._type
+                'fieldType': record._type,
             }
 
     @staticmethod
@@ -282,7 +304,7 @@ class OvhProvider(BaseProvider):
                 f'{value.target}',
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': record._type
+                'fieldType': record._type,
             }
 
     @staticmethod
@@ -293,7 +315,7 @@ class OvhProvider(BaseProvider):
                 f'{value.fingerprint}',
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': record._type
+                'fieldType': record._type,
             }
 
     def _params_for_TXT(self, record):
@@ -306,7 +328,7 @@ class OvhProvider(BaseProvider):
                 'target': value,
                 'subDomain': record.name,
                 'ttl': record.ttl,
-                'fieldType': field_type
+                'fieldType': field_type,
             }
 
     _params_for_A = _params_for_multiple
@@ -319,13 +341,15 @@ class OvhProvider(BaseProvider):
 
     def _is_valid_dkim(self, value):
         """Check if value is a valid DKIM"""
-        validator_dict = {'h': lambda val: val in ['sha1', 'sha256'],
-                          's': lambda val: val in ['*', 'email'],
-                          't': lambda val: val in ['y', 's'],
-                          'v': lambda val: val == 'DKIM1',
-                          'k': lambda val: val == 'rsa',
-                          'n': lambda _: True,
-                          'g': lambda _: True}
+        validator_dict = {
+            'h': lambda val: val in ['sha1', 'sha256'],
+            's': lambda val: val in ['*', 'email'],
+            't': lambda val: val in ['y', 's'],
+            'v': lambda val: val == 'DKIM1',
+            'k': lambda val: val == 'rsa',
+            'n': lambda _: True,
+            'g': lambda _: True,
+        }
 
         splitted = [v for v in value.split('\\;') if v]
         found_key = False
@@ -382,8 +406,11 @@ class OvhProvider(BaseProvider):
         :param record_type: fieldType
         :param subdomain: subDomain
         """
-        records = self._client.get(f'/domain/zone/{zone_name}/record',
-                                   fieldType=record_type, subDomain=subdomain)
+        records = self._client.get(
+            f'/domain/zone/{zone_name}/record',
+            fieldType=record_type,
+            subDomain=subdomain,
+        )
         for record in records:
             self.delete_record(zone_name, record)
 
@@ -403,6 +430,5 @@ class OvhProvider(BaseProvider):
         :param params: {'fieldType': 'A', 'ttl': 60, 'subDomain': 'www',
         'target': '1.2.3.4'
         """
-        self.log.debug('Create record: zone: %s, id %s', zone_name,
-                       params)
+        self.log.debug('Create record: zone: %s, id %s', zone_name, params)
         return self._client.post(f'/domain/zone/{zone_name}/record', **params)
