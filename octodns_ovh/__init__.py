@@ -60,7 +60,7 @@ class OvhProvider(BaseProvider):
             application_key,
             consumer_key,
         )
-        super(OvhProvider, self).__init__(id, *args, **kwargs)
+        super().__init__(id, *args, **kwargs)
         self._client = ovh.Client(
             endpoint=endpoint,
             application_key=application_key,
