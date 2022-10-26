@@ -426,7 +426,7 @@ class TestOvhProvider(TestCase):
 
             zone = Zone('unit.tests.', [])
             get_mock.side_effect = ResourceNotFoundError(
-                'This service does ' 'not exist'
+                'This service does not exist'
             )
             exists = provider.populate(zone)
             self.assertEqual(set(), zone.records)
