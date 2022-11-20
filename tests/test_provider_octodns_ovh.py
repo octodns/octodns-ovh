@@ -463,6 +463,7 @@ class TestOvhProvider(TestCase):
             'application_key',
             'application_secret',
             'consumer_key',
+            strict_supports=False,
         )
 
         desired = Zone('unit.tests.', [])
