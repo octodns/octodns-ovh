@@ -1,3 +1,7 @@
+## v0.0.2 - 2022-11-20 -
+
+* Remove extra . on the end of SRV record targets
+
 ## v0.0.1 - 2022-01-13 - Moving
 
 #### Nothworthy Changes
