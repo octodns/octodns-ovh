@@ -1,4 +1,4 @@
-## v0.0.2 - 2022-11-20 -
+## v0.0.2 - 2022-11-20 - Less dots
 
 * Remove extra . on the end of SRV record targets
 
