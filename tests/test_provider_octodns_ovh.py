@@ -3,9 +3,9 @@
 #
 
 from unittest import TestCase
-from unittest.mock import patch, call
+from unittest.mock import call, patch
 
-from ovh import APIError, ResourceNotFoundError, InvalidCredential
+from ovh import APIError, InvalidCredential, ResourceNotFoundError
 
 from octodns.record import Record
 from octodns.zone import Zone
