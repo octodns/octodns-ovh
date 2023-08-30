@@ -41,6 +41,10 @@ class OvhProvider(BaseProvider):
         )
     )
 
+    @property
+    def SUPPORTS_ROOT_NS(self):
+        return True
+
     def __init__(
         self,
         id,
