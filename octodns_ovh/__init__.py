@@ -20,6 +20,7 @@ class OvhProvider(BaseProvider):
     SUPPORTS_GEO = False
     SUPPORTS_DYNAMIC = False
     ZONE_NOT_FOUND_MESSAGE = 'This service does not exist'
+    SUPPORTS_ROOT_NS = True
 
     # This variable is also used in populate method to filter which OVH record
     # types are supported by octodns
