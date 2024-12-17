@@ -247,28 +247,6 @@ class TestOvhProvider(TestCase):
         )
     )
 
-    # SPF
-    api_record.append(
-        {
-            'fieldType': 'SPF',
-            'ttl': 1000,
-            'target': 'v=spf1 include:unit.texts.redirect ~all',
-            'subDomain': '',
-            'id': 13,
-        }
-    )
-    expected.add(
-        Record.new(
-            zone,
-            '',
-            {
-                'ttl': 1000,
-                'type': 'SPF',
-                'value': 'v=spf1 include:unit.texts.redirect ~all',
-            },
-        )
-    )
-
     # SSHFP
     api_record.append(
         {
@@ -536,13 +514,6 @@ class TestOvhProvider(TestCase):
                         subDomain='',
                         target='10 mx1.unit.tests.',
                         ttl=400,
-                    ),
-                    call(
-                        '/domain/zone/unit.tests/record',
-                        fieldType='SPF',
-                        subDomain='',
-                        target='v=spf1 include:unit.texts.redirect ~all',
-                        ttl=1000,
                     ),
                     call(
                         '/domain/zone/unit.tests/record',

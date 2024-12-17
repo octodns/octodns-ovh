@@ -36,7 +36,6 @@ class OvhProvider(BaseProvider):
             'NAPTR',
             'NS',
             'PTR',
-            'SPF',
             'SRV',
             'SSHFP',
             'TXT',
@@ -241,7 +240,6 @@ class OvhProvider(BaseProvider):
     _data_for_AAAA = _data_for_multiple
     _data_for_NS = _data_for_multiple
     _data_for_TXT = _data_for_multiple
-    _data_for_SPF = _data_for_multiple
     _data_for_PTR = _data_for_single
     _data_for_CNAME = _data_for_single
 
@@ -336,7 +334,6 @@ class OvhProvider(BaseProvider):
     _params_for_A = _params_for_multiple
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
-    _params_for_SPF = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
     _params_for_PTR = _params_for_single
