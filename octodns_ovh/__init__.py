@@ -149,11 +149,10 @@ class OvhProvider(BaseProvider):
 
     @staticmethod
     def _data_for_multiple(_type, records):
-        return {
-            'ttl': records[0]['ttl'],
-            'type': _type,
-            'values': [record['target'] for record in records],
-        }
+        values = [record['target'] for record in records]
+        if _type == "TXT":
+            values = [value.replace(";", "\\;") for value in values]
+        return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     @staticmethod
     def _data_for_single(_type, records):
@@ -323,7 +322,7 @@ class OvhProvider(BaseProvider):
             field_type = 'TXT'
             if self._is_valid_dkim(value):
                 field_type = 'DKIM'
-                value = value.replace("\\;", ";")
+            value = value.replace("\\;", ";")
             yield {
                 'target': value,
                 'subDomain': record.name,
