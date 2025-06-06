@@ -150,8 +150,6 @@ class OvhProvider(BaseProvider):
     @staticmethod
     def _data_for_multiple(_type, records):
         values = [record['target'] for record in records]
-        if _type == "TXT":
-            values = [value.replace(";", "\\;") for value in values]
         return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     @staticmethod
@@ -238,9 +236,14 @@ class OvhProvider(BaseProvider):
     _data_for_A = _data_for_multiple
     _data_for_AAAA = _data_for_multiple
     _data_for_NS = _data_for_multiple
-    _data_for_TXT = _data_for_multiple
     _data_for_PTR = _data_for_single
     _data_for_CNAME = _data_for_single
+
+    @staticmethod
+    def _data_for_TXT(_type, records):
+        values = [record['target'] for record in records]
+        values = [value.replace(";", "\\;") for value in values]
+        return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     @staticmethod
     def _params_for_multiple(record):
