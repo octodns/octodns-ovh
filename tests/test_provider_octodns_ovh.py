@@ -321,6 +321,28 @@ class TestOvhProvider(TestCase):
         )
     )
 
+    # TXT DMARC case with unescaped semicolons
+    api_record.append(
+        {
+            'fieldType': 'TXT',
+            'ttl': 3600,
+            'target': 'v=DMARC1; p=none; sp=none; rua=mailto:admin@example.com!10m; ruf=mailto:admin@example.com!10m; rf=afrf; pct=100; ri=86400',
+            'subDomain': '_dmarc',
+            'id': 18,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            '_dmarc',
+            {
+                'ttl': 3600,
+                'type': 'TXT',
+                'value': 'v=DMARC1\\; p=none\\; sp=none\\; rua=mailto:admin@example.com!10m\\; ruf=mailto:admin@example.com!10m\\; rf=afrf\\; pct=100\\; ri=86400',
+            },
+        )
+    )
+
     # LOC
     # We do not have associated record for LOC, as it's not managed
     api_record.append(
@@ -329,7 +351,7 @@ class TestOvhProvider(TestCase):
             'ttl': 1500,
             'target': '1 1 1 N 1 1 1 E 1m 1m',
             'subDomain': '',
-            'id': 18,
+            'id': 19,
         }
     )
 
@@ -340,7 +362,7 @@ class TestOvhProvider(TestCase):
             'ttl': 1600,
             'target': '0 issue "ca.unit.tests"',
             'subDomain': 'caa',
-            'id': 19,
+            'id': 20,
         }
     )
     expected.add(
@@ -610,6 +632,13 @@ class TestOvhProvider(TestCase):
                         subDomain='txt',
                         target='TXT text',
                         ttl=1400,
+                    ),
+                    call(
+                        '/domain/zone/unit.tests/record',
+                        fieldType='TXT',
+                        subDomain='_dmarc',
+                        target='v=DMARC1; p=none; sp=none; rua=mailto:admin@example.com!10m; ruf=mailto:admin@example.com!10m; rf=afrf; pct=100; ri=86400',
+                        ttl=3600,
                     ),
                     call('/domain/zone/unit.tests/refresh'),
                 ]
