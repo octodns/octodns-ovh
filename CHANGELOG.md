@@ -1,3 +1,7 @@
+## v1.1.0 - 2025-07-01 - Normal TXT
+
+* Normalize TXT records to prevent unnecessary updates
+
 ## v1.0.0 - 2025-05-04 - Long overdue 1.0
 
 ### Notedworthy Changes:
