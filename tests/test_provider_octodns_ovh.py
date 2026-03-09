@@ -379,6 +379,90 @@ class TestOvhProvider(TestCase):
         )
     )
 
+    # HTTPS
+    api_record.append(
+        {
+            'fieldType': 'HTTPS',
+            'ttl': 1700,
+            'target': '1 . alpn=h2,h3',
+            'subDomain': '',
+            'id': 21,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            '',
+            {
+                'ttl': 1700,
+                'type': 'HTTPS',
+                'values': [
+                    {
+                        'svcpriority': 1,
+                        'targetname': '.',
+                        'svcparams': {'alpn': ['h2', 'h3']},
+                    }
+                ],
+            },
+        )
+    )
+
+    # SVCB (service mode)
+    api_record.append(
+        {
+            'fieldType': 'SVCB',
+            'ttl': 1800,
+            'target': '1 svc.unit.tests. alpn=h2 port=443',
+            'subDomain': 'svcb',
+            'id': 22,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            'svcb',
+            {
+                'ttl': 1800,
+                'type': 'SVCB',
+                'values': [
+                    {
+                        'svcpriority': 1,
+                        'targetname': 'svc.unit.tests.',
+                        'svcparams': {'alpn': ['h2'], 'port': 443},
+                    }
+                ],
+            },
+        )
+    )
+
+    # HTTPS (alias mode)
+    api_record.append(
+        {
+            'fieldType': 'HTTPS',
+            'ttl': 1900,
+            'target': '0 cdn.unit.tests.',
+            'subDomain': 'alias',
+            'id': 23,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            'alias',
+            {
+                'ttl': 1900,
+                'type': 'HTTPS',
+                'values': [
+                    {
+                        'svcpriority': 0,
+                        'targetname': 'cdn.unit.tests.',
+                        'svcparams': {},
+                    }
+                ],
+            },
+        )
+    )
+
     valid_dkim = [
         valid_dkim_key,
         'v=DKIM1 \\; %s' % valid_dkim_key,
@@ -639,6 +723,27 @@ class TestOvhProvider(TestCase):
                         subDomain='_dmarc',
                         target='v=DMARC1; p=none; sp=none; rua=mailto:admin@example.com!10m; ruf=mailto:admin@example.com!10m; rf=afrf; pct=100; ri=86400',
                         ttl=3600,
+                    ),
+                    call(
+                        '/domain/zone/unit.tests/record',
+                        fieldType='HTTPS',
+                        subDomain='',
+                        target='1 . alpn=h2,h3',
+                        ttl=1700,
+                    ),
+                    call(
+                        '/domain/zone/unit.tests/record',
+                        fieldType='SVCB',
+                        subDomain='svcb',
+                        target='1 svc.unit.tests. alpn=h2 port=443',
+                        ttl=1800,
+                    ),
+                    call(
+                        '/domain/zone/unit.tests/record',
+                        fieldType='HTTPS',
+                        subDomain='alias',
+                        target='0 cdn.unit.tests.',
+                        ttl=1900,
                     ),
                     call('/domain/zone/unit.tests/refresh'),
                 ]
