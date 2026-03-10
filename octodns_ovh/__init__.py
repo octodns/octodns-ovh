@@ -12,6 +12,7 @@ from ovh import ResourceNotFoundError
 
 from octodns.provider.base import BaseProvider
 from octodns.record import Record
+from octodns.record.svcb import SvcbValue
 
 # TODO: remove __VERSION__ with the next major version release
 __version__ = __VERSION__ = '1.1.0'
@@ -32,12 +33,14 @@ class OvhProvider(BaseProvider):
             'CAA',
             'CNAME',
             'DKIM',
+            'HTTPS',
             'MX',
             'NAPTR',
             'NS',
             'PTR',
             'SRV',
             'SSHFP',
+            'SVCB',
             'TXT',
         )
     )
@@ -224,6 +227,15 @@ class OvhProvider(BaseProvider):
         return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
 
     @staticmethod
+    def _data_for_SVCB(_type, records):
+        values = []
+        for record in records:
+            values.append(SvcbValue.parse_rdata_text(record['target']))
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
+
+    _data_for_HTTPS = _data_for_SVCB
+
+    @staticmethod
     def _data_for_DKIM(_type, records):
         return {
             'ttl': records[0]['ttl'],
@@ -333,12 +345,24 @@ class OvhProvider(BaseProvider):
                 'fieldType': field_type,
             }
 
+    @staticmethod
+    def _params_for_SVCB(record):
+        for value in record.values:
+            yield {
+                'target': value.rdata_text,
+                'subDomain': record.name,
+                'ttl': record.ttl,
+                'fieldType': record._type,
+            }
+
     _params_for_A = _params_for_multiple
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
     _params_for_PTR = _params_for_single
+
+    _params_for_HTTPS = _params_for_SVCB
 
     def _is_valid_dkim(self, value):
         """Check if value is a valid DKIM"""
