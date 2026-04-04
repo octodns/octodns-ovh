@@ -1,3 +1,11 @@
+## 1.2.0 - 2026-04-03
+
+Minor:
+* Add SVCB and HTTPS record support - [#62](https://github.com/octodns/octodns-ovh/pull/62)
+
+Patch:
+* Use new [changelet](https://github.com/octodns/changelet) tooling - [#50](https://github.com/octodns/octodns-ovh/pull/50)
+
 ## v1.1.0 - 2025-07-01 - Normal TXT
 
 * Normalize TXT records to prevent unnecessary updates
