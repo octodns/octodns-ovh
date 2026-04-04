@@ -15,7 +15,7 @@ from octodns.record import Record
 from octodns.record.svcb import SvcbValue
 
 # TODO: remove __VERSION__ with the next major version release
-__version__ = __VERSION__ = '1.1.0'
+__version__ = __VERSION__ = '1.2.0'
 
 
 class OvhProvider(BaseProvider):
