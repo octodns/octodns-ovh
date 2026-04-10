@@ -252,7 +252,7 @@ class TestOvhProvider(TestCase):
         {
             'fieldType': 'SSHFP',
             'ttl': 1100,
-            'target': '1 1 bf6b6825d2977c511a475bbefb88aad54a92ac73 ',
+            'target': '1 1 bf6b6825d2977c511a475bbefb88aad54a92ac73',
             'subDomain': '',
             'id': 14,
         }
