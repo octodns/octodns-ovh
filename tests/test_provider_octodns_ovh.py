@@ -599,11 +599,10 @@ class TestOvhProvider(TestCase):
 
             plan = provider.plan(desired)
 
-            with patch.object(
-                provider._client, 'post'
-            ) as post_mock, patch.object(
-                provider._client, 'delete'
-            ) as delete_mock:
+            with (
+                patch.object(provider._client, 'post') as post_mock,
+                patch.object(provider._client, 'delete') as delete_mock,
+            ):
                 get_mock.side_effect = [[100], [101], [102], [103]]
                 provider.apply(plan)
                 wanted_calls = [
